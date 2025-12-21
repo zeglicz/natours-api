@@ -1,13 +1,27 @@
+const fs = require('fs');
 const express = require('express');
 
 const app = express();
 
-app.get('/', (req, res) => {
-  // Send HTML - default 200, if we don't specify exact status code
-  // res.status(200).send('Hello from the server side!');
+// app.get('/', (req, res) => {
+//   // Send HTML - default 200, if we don't specify exact status code
+//   // res.status(200).send('Hello from the server side!');
+//   res.status(200).json({
+//     message: 'Hello from the server side!',
+//     app: 'Natours',
+//   });
+// });
+
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
+);
+
+app.get('/api/v1/tours', (req, res) => {
   res.status(200).json({
-    message: 'Hello from the server side!',
-    app: 'Natours',
+    status: 'success',
+    resaults: tours.length,
+    data: { tours },
+    // data: { tours: tours },
   });
 });
 
