@@ -2,9 +2,9 @@
   "name": "natours",
   "version": "1.0.0",
   "description": "Learning node, express and mongoDB",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,9 @@
   "homepage": "https://github.com/zeglicz/natours-api#readme",
   "dependencies": {
     "express": "^4.22.1",
-    "morgan": "^1.10.1",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.11"
   }
 }
