@@ -1,11 +1,29 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
+
+////////////////////////
+// 1. MIDDLE WARES
+////////////////////////
+
+app.use(morgan('dev'));
 
 // This is middleware - middle ware is basically just a function that can modify the incoming request data. It's called middleware because it stands between of the request and the response. It's just a step that the request goes through while it's being processed
 // In this example is simply that the data from the body is added to it (the request object) by using this middleware
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Hello from the middleware');
+  // DO NOT forget next()
+  next();
+});
+
+app.use((req, res, next) => {
+  req.reqestTime = new Date().toISOString();
+  next();
+});
 
 ////////////////////////
 ////////////////////////
@@ -25,7 +43,7 @@ app.use(express.json());
 // });
 
 ////////////////////////
-////////////////////////
+// 2. ROUTES HANDLERS
 ////////////////////////
 
 const tours = JSON.parse(
@@ -33,9 +51,11 @@ const tours = JSON.parse(
 );
 
 const getAllTours = (req, res) => {
+  console.log(req.reqestTime);
   res.status(200).json({
     status: 'success',
     results: tours.length,
+    requestedAt: req.reqestTime,
     data: { tours },
     // data: { tours: tours },
   });
@@ -51,7 +71,7 @@ const getTour = (req, res) => {
       status: 'fail',
       messsage: 'Invalid ID',
     });
-  console.log(tour);
+  // console.log(tour);
 
   res.status(200).json({
     status: 'success',
@@ -109,24 +129,6 @@ const deleteTour = (req, res) => {
   });
 };
 
-// app.get('/api/v1/tours', getAllTours);
-// app.get('/api/v1/tours/:id', getTour);
-// app.post('/api/v1/tours', createTour);
-// app.patch('/api/v1/tours/:id', updateTour);
-// app.delete('/api/v1/tours/:id', deleteTour);
-
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
-app
-  .route('/api/v1/tours/:id')
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
-
-const port = 3000;
-app.listen(port, () => {
-  console.log(`App running on port ${port}…`);
-});
-
 // this is exact api url endpoint
 // ? question mark make it optional
 // app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
@@ -135,3 +137,36 @@ app.listen(port, () => {
 //   console.log(req.params);
 //   res.status(200).json({ status: 'success' });
 // });
+
+////////////////////////
+// 3. ROUTES
+////////////////////////
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
+
+// routes from up end req-res cycle so this doesn't show
+app.use((req, res, next) => {
+  console.log('Hello from the middleware between routes');
+  next();
+});
+
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
+
+////////////////////////
+// 4, START SERVER
+////////////////////////
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`App running on port ${port}…`);
+});

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/zeglicz/natours-api#readme",
   "dependencies": {
     "express": "^4.22.1",
+    "morgan": "^1.10.1",
     "nodemon": "^3.1.11"
   }
 }
