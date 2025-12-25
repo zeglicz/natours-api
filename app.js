@@ -9,8 +9,7 @@ const app = express();
 ////////////////////////
 // 1. MIDDLE WARES
 ////////////////////////
-
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // This is middleware - middle ware is basically just a function that can modify the incoming request data. It's called middleware because it stands between of the request and the response. It's just a step that the request goes through while it's being processed
 // In this example is simply that the data from the body is added to it (the request object) by using this middleware
