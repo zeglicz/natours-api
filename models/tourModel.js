@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Everything else (properties) that is not in our schema will be ignored
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
