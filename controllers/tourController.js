@@ -3,13 +3,22 @@ const Tour = require('../models/tourModel');
 exports.getAllTours = async (req, res) => {
   try {
     // BUILD THE QUERY
+    // 1. Filtering
     // eslint-disable-next-line node/no-unsupported-features/es-syntax
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    // 2. Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
     // console.log(req.query, queryObj);
-    const query = await Tour.find(queryObj);
+    const query = await Tour.find(JSON.parse(queryStr));
+
+    // {difficulty: 'easy', duration: { $gte: 5 }} // mongoDB query
+    // {difficulty: 'easy', duration: { gte: '5' }} // req.query
+    // gte, gt, lte, lt
 
     // const query = await Tour.find({
     // duration: 5,
