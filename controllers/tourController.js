@@ -49,8 +49,28 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v');
     }
 
+    // 4. Pagination
+    const DEFAULT_PAGE = 1;
+    const DEFAULT_LIMIT_PER_PAGE = 5;
+
+    // page=2&limit=10, 1-10 (page 1), 11-20 (page 2)
+    // query = query.skip(10).limit(10);
+
+    const page = Number(req.query.page) || DEFAULT_PAGE;
+    const limitPerPage = Number(req.query.limit) || DEFAULT_LIMIT_PER_PAGE;
+    // const skip = page * limitPerPage - limitPerPage;
+    const skip = (page - 1) * limitPerPage;
+
+    query = query.skip(skip).limit(limitPerPage);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exists');
+    }
+
     // EXECUTE THE QUERY
     const tours = await query;
+    // query.sort().select().skip().limit()
 
     // SEND RESPONSE
     res.status(200).json({
