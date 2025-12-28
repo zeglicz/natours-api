@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 // Everything else (properties) that is not in our schema will be ignored
 const tourSchema = new mongoose.Schema(
@@ -9,6 +10,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -56,6 +58,27 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
   return (this.duration / 7).toFixed(2);
 });
+
+// Document Middleware - pre (before): only work before .save() and .create() NOT .insertMany() etc.
+// You can use callback pattern with next() or use async function
+// if you use async, you can use await inside for someAsyncOperation()
+tourSchema.pre('save', async function () {
+  this.slug = slugify(this.name, { lower: true });
+});
+
+// tourSchema.pre('save', () => {
+//   console.log('Will save document');
+// });
+
+// Document Middleware - post (after): only work after .save() and .create()
+// tourSchema.post('save', (doc, next) => {
+//   console.log(doc);
+//   next();
+// });
+
+// tourSchema.post('save', async (doc) => {
+//   console.log(doc);
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
