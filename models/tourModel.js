@@ -47,6 +47,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true }, // add virtual values to output
@@ -59,7 +63,10 @@ tourSchema.virtual('durationWeeks').get(function () {
   return (this.duration / 7).toFixed(2);
 });
 
+// https://mongoosejs.com/docs/middleware.html
+
 // Document Middleware - pre (before): only work before .save() and .create() NOT .insertMany() etc.
+// THIS point to current document
 // You can use callback pattern with next() or use async function
 // if you use async, you can use await inside for someAsyncOperation()
 tourSchema.pre('save', async function () {
@@ -79,6 +86,20 @@ tourSchema.pre('save', async function () {
 // tourSchema.post('save', async (doc) => {
 //   console.log(doc);
 // });
+
+// Query Middleware
+// THIS point to current query
+// tourSchema.pre('find', async function () {
+// now it work for every command which start with word find
+tourSchema.pre(/^find/, async function () {
+  this.find({ secretTour: { $ne: true } }); // $ne - not equal
+  this.start = Date.now();
+});
+
+tourSchema.post(/^find/, async function (doc) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+  // console.log(doc);
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
