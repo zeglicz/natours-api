@@ -96,9 +96,32 @@ tourSchema.pre(/^find/, async function () {
   this.start = Date.now();
 });
 
+// eslint-disable-next-line no-unused-vars
 tourSchema.post(/^find/, async function (doc) {
   console.log(`Query took ${Date.now() - this.start} milliseconds`);
   // console.log(doc);
+});
+
+// Aggregation Middleware
+// THIS.pipeline()
+// [
+//   { $match: { ratingsAverage: [Object] } },
+//   {
+//     $group: {
+//       _id: [Object],
+//       numTours: [Object],
+//       numRatings: [Object],
+//       avgRating: [Object],
+//       avgPrice: [Object],
+//       minPrice: [Object],
+//       maxPrice: [Object],
+//     },
+//   },
+//   { $sort: { avgPrice: 1 } },
+// ];
+tourSchema.pre('aggregate', async function () {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // exclude secret tours from aggregation
+  // console.log(this.pipeline());
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
