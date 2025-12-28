@@ -11,6 +11,9 @@ router
   .route('/top-5-cheap')
   .get(tourController.aliasTopTours, tourController.getAllTours);
 
+// Aggregation
+router.route('/stats').get(tourController.getTourStats);
+
 router
   .route('/')
   .get(tourController.getAllTours)
